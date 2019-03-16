@@ -143,20 +143,25 @@ L_end_tecla:
 
 _interrupt:
 
-;Practica5A.c,5 :: 		void interrupt(){
-;Practica5A.c,6 :: 		key=tecla();
+;Practica5A.c,18 :: 		void interrupt(){
+;Practica5A.c,19 :: 		key=tecla(); // en la variable key se guarda el valor ASCII de la tecla pulsada
 	CALL        _tecla+0, 0
 	MOVF        R0, 0 
 	MOVWF       _key+0 
-;Practica5A.c,7 :: 		x=PORTB;
+;Practica5A.c,20 :: 		x=PORTB; // para poder borrar el bit RBIF (define x global)
 	MOVF        PORTB+0, 0 
 	MOVWF       _x+0 
-;Practica5A.c,8 :: 		INTCON.RBIF=0;
+;Practica5A.c,21 :: 		INTCON.RBIF=0; // se borra el bit RBIF después de llamar a la función tecla()
 	BCF         INTCON+0, 0 
-;Practica5A.c,9 :: 		PORTD=key;
+;Practica5A.c,22 :: 		Lcd_Chr(1,1,key);
+	MOVLW       1
+	MOVWF       FARG_Lcd_Chr_row+0 
+	MOVLW       1
+	MOVWF       FARG_Lcd_Chr_column+0 
 	MOVF        R0, 0 
-	MOVWF       PORTD+0 
-;Practica5A.c,10 :: 		}
+	MOVWF       FARG_Lcd_Chr_out_char+0 
+	CALL        _Lcd_Chr+0, 0
+;Practica5A.c,24 :: 		}
 L_end_interrupt:
 L__interrupt15:
 	RETFIE      1
@@ -164,36 +169,28 @@ L__interrupt15:
 
 _main:
 
-;Practica5A.c,12 :: 		void main() {
-;Practica5A.c,13 :: 		ADCON1=0x07;
-	MOVLW       7
-	MOVWF       ADCON1+0 
-;Practica5A.c,14 :: 		TRISB=0xF0;
+;Practica5A.c,26 :: 		void main() {
+;Practica5A.c,28 :: 		TRISB=0xF0; // el nibble alto son entradas y el nibble bajo son salidas
 	MOVLW       240
 	MOVWF       TRISB+0 
-;Practica5A.c,15 :: 		TRISD=0;
-	CLRF        TRISD+0 
-;Practica5A.c,16 :: 		PORTD=0;
-	CLRF        PORTD+0 
-;Practica5A.c,17 :: 		PORTB=0;
+;Practica5A.c,29 :: 		PORTB=0;
 	CLRF        PORTB+0 
-;Practica5A.c,18 :: 		INTCON2.RBPU=0;
+;Practica5A.c,31 :: 		INTCON2.RBPU=0; // se habilitan las resistencias de pullup del puerto B
 	BCF         INTCON2+0, 7 
-;Practica5A.c,19 :: 		INTCON.RBIF=0;
-	BCF         INTCON+0, 0 
-;Practica5A.c,20 :: 		INTCON.RBIE=1;
-	BSF         INTCON+0, 3 
-;Practica5A.c,21 :: 		while(1){
-L_main11:
-;Practica5A.c,22 :: 		x=PORTB;
+;Practica5A.c,32 :: 		x=PORTB; //para poder borrar el RBIF
 	MOVF        PORTB+0, 0 
 	MOVWF       _x+0 
-;Practica5A.c,23 :: 		PORTD=0x3D;
-	MOVLW       61
-	MOVWF       PORTD+0 
-;Practica5A.c,24 :: 		}
+;Practica5A.c,33 :: 		INTCON.RBIF=0;
+	BCF         INTCON+0, 0 
+;Practica5A.c,34 :: 		INTCON.RBIE=1;
+	BSF         INTCON+0, 3 
+;Practica5A.c,35 :: 		INTCON.GIE = 1;
+	BSF         INTCON+0, 7 
+;Practica5A.c,36 :: 		Lcd_Init();
+	CALL        _Lcd_Init+0, 0
+;Practica5A.c,37 :: 		while(1); }
+L_main11:
 	GOTO        L_main11
-;Practica5A.c,25 :: 		}
 L_end_main:
 	GOTO        $+0
 ; end of _main
