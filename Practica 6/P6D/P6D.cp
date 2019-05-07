@@ -1,4 +1,4 @@
-#line 1 "D:/Escritorio/Prácticas HAE 18-19/HAE_6 jueves 10-30 a 12-30/P6D/P6D.c"
+#line 1 "C:/Users/curra/Documents/GitHub/Practicas-de-Hardware-de-aplicacion-especifica/Practica 6/P6D/P6D.c"
 
 sbit LCD_RS at RD2_bit;
 sbit LCD_EN at RD3_bit;
@@ -15,25 +15,27 @@ sbit LCD_D5_Direction at TRISD5_bit;
 sbit LCD_D4_Direction at TRISD4_bit;
 
 char x;
-unsigned short aux=0;
+unsigned short contador=0;
 char num[4];
-char primera=1;
 
 void interrupt(){
  x = PORTB;
- INTCON.RBIF = 0;
- if(primera){
- T0CON = 0x84;
- primera=0;
- }
- if(x){
- TMR0H = (3036>>8);
- TMR0L = 3036;
- aux=aux+1;
- ByteToStr(aux,num);
- Lcd_out(1,1,num);
- }
+ if(INTCON.RBIF){
+ T0CON.TMR0ON=1;
 
+ TMR0L=6;
+ }
+ if(INTCON.TMR0IF){
+ PORTC.B0=!PORTC.B0;
+ contador++;
+ }
+ if(!x){
+
+ ByteToStr(contador,num);
+ Lcd_out(1,1,num);
+ T0CON.TMR0ON=0;
+ }
+ INTCON.RBIF = 0;
  INTCON.TMR0IF = 0;
 }
 
@@ -43,13 +45,15 @@ void main() {
  PORTD=0;
  TRISD=0;
  TRISB.B4=1;
+
  RCON.IPEN = 0;
  x = PORTB;
  INTCON.RBIF = 0;
  INTCON.RBIE = 1;
+ T0CON=0x41;
  INTCON.TMR0IF = 0;
  INTCON.TMR0IE = 1;
  INTCON.GIE = 1;
  Lcd_Init();
- while(1);
+ while(1) asm nop;
 }
