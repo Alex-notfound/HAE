@@ -1,6 +1,6 @@
-# Practicas-de-Hardware-de-aplicacion-especifica
+# HAE
 
-Prácticas realizadas en dicha carrera de tercero de Grado en Ingeniería Informática.
+Prácticas realizadas en la asignatura de Hardware de aplicación específica (HAE) durante el tercer año del Grado de Ingeniería Informática.
 
 Consisten en diferentes programas ejecutados por un microcontrolador PIC18F452 en un simulador de circuitos.
 Se adjunta PDF con lo que se ha realizado en cada práctica.
